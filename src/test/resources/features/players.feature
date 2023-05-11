@@ -1,4 +1,4 @@
-Feature: Player functionnalities
+Feature: Player functionalities
 
   @Nominal
   Scenario: Get all players

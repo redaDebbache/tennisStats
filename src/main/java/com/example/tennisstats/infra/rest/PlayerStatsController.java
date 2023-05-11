@@ -4,8 +4,10 @@ import com.example.tennisstats.domain.adapter.GetPlayerByIdQuery;
 import com.example.tennisstats.domain.adapter.GetPlayersAdapter;
 import com.example.tennisstats.domain.model.PlayerModel;
 import com.example.tennisstats.infra.dto.PlayerDto;
+import com.example.tennisstats.infra.dto.PlayerFullInfosDto;
 import com.example.tennisstats.infra.dto.PlayersResponse;
 import com.example.tennisstats.infra.mapper.PlayerRestMapper;
+import com.example.tennisstats.infra.repository.ApiError;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,19 +28,21 @@ import java.util.List;
 @RequiredArgsConstructor
 @Log4j2
 public class PlayerStatsController {
-private final GetPlayersAdapter getPlayersAdapter;
-private final PlayerRestMapper mapper;
+    private final GetPlayersAdapter getPlayersAdapter;
+    private final PlayerRestMapper mapper;
+
     @GetMapping
     @Tag(name = "All Players")
     @Operation(summary = "Returns all available players ordered from best to worst.", description = "The order criterion is defined by the number of points obtained by each player. This data being the property of an underlying object, to access it, it is recommended to follow the GET full infos link provided for each player to obtain their complete information."
-            )
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success: Either returns available players or players are empty",
-                    content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = PlayerDto.class)) }),
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PlayerDto.class))}),
             @ApiResponse(responseCode = "5xx", description = "An unexpected error occurred",
-                    content = @Content)})
-    public PlayersResponse getAllPlayers(){
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)))})
+    public PlayersResponse getAllPlayers() {
         log.debug("Requesting all players");
         List<PlayerModel> playerModels = getPlayersAdapter.getAllOrderedByPointsDesc();
         return mapper.mapToResponse(playerModels);
@@ -46,17 +50,22 @@ private final PlayerRestMapper mapper;
 
     @GetMapping("/{id}")
     @Tag(name = "All Players")
-    @Operation(summary = "Returns all available players ordered from best to worst.", description = "The order criterion is defined by the number of points obtained by each player. This data being the property of an underlying object, to access it, it is recommended to follow the GET full infos link provided for each player to obtain their complete information."
-            )
+    @Operation(summary = "Return a player identified by it's id.", description = "The server will return the player full infos, or throw an 404 error otherwiser"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Success: Either returns available players or players are empty",
-                    content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = PlayerDto.class)) }),
+            @ApiResponse(responseCode = "200", description = "Success: A valid Player is returned",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PlayerDto.class))}),
+
+            @ApiResponse(responseCode = "404", description = "Player not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(responseCode = "5xx", description = "An unexpected error occurred",
-                    content = @Content)})
-    public PlayerDto getPlayer(@PathVariable("id") Long id){
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)))})
+    public PlayerFullInfosDto getPlayer(@PathVariable("id") Long id) {
         log.debug("Requesting all players");
         PlayerModel playerModel = getPlayersAdapter.getPlayerById(new GetPlayerByIdQuery(id));
-        return mapper.map(playerModel);
+        return mapper.mapFullInfos(playerModel);
     }
 }

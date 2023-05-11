@@ -3,10 +3,7 @@ package com.example.tennisstats.infra.mapper;
 import com.example.tennisstats.domain.model.CountryModel;
 import com.example.tennisstats.domain.model.PlayerDataModel;
 import com.example.tennisstats.domain.model.PlayerModel;
-import com.example.tennisstats.infra.dto.CountryDto;
-import com.example.tennisstats.infra.dto.PlayerDataDto;
-import com.example.tennisstats.infra.dto.PlayerDto;
-import com.example.tennisstats.infra.dto.PlayersResponse;
+import com.example.tennisstats.infra.dto.*;
 import com.example.tennisstats.infra.hatoasLink.ResourceLink;
 import com.example.tennisstats.infra.rest.PlayerStatsController;
 import org.mapstruct.Mapper;
@@ -43,4 +40,6 @@ public interface PlayerRestMapper {
    default PlayersResponse mapToResponse(List<PlayerModel> playerModels){
        return new PlayersResponse(firstNonNull(mapAll(playerModels), Collections.emptyList()));
    }
+
+    PlayerFullInfosDto mapFullInfos(PlayerModel playerModel);
 }

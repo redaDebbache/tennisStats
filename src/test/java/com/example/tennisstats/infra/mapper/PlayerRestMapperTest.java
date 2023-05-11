@@ -3,10 +3,7 @@ package com.example.tennisstats.infra.mapper;
 import com.example.tennisstats.domain.model.CountryModel;
 import com.example.tennisstats.domain.model.PlayerDataModel;
 import com.example.tennisstats.domain.model.PlayerModel;
-import com.example.tennisstats.infra.dto.CountryDto;
-import com.example.tennisstats.infra.dto.PlayerDataDto;
-import com.example.tennisstats.infra.dto.PlayerDto;
-import com.example.tennisstats.infra.dto.PlayersResponse;
+import com.example.tennisstats.infra.dto.*;
 import com.example.tennisstats.infra.hatoasLink.ResourceLink;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -96,6 +93,57 @@ class PlayerRestMapperTest {
         //Then
         Assertions.assertThat(target).isNull();
     }
+
+    @Test
+    void should_map_player_model_to_full_infos_dto() {
+        //Given
+        PlayerDataModel dataModel = new PlayerDataModel(1, 200L, 8000, 180, 35, List.of(1, 0, 1, 0, 1, 1));
+        CountryModel country = new CountryModel("picture-url", "ESP");
+
+        PlayerModel source = new PlayerModel(1L, "John", "Doe", "J.D", "player-picture", "M", country, dataModel);
+
+        //When
+        PlayerFullInfosDto target = mapper.mapFullInfos(source);
+        //Then
+        Assertions.assertThat(target).isNotNull();
+        Assertions.assertThat(target.firstName()).isEqualTo(source.firstName());
+        Assertions.assertThat(target.lastName()).isEqualTo(source.lastName());
+        Assertions.assertThat(target.sex()).isEqualTo(source.sex());
+        Assertions.assertThat(target.data().points()).isEqualTo(dataModel.points());
+        Assertions.assertThat(target.data().rank()).isEqualTo(dataModel.rank());
+        Assertions.assertThat(target.data().age()).isEqualTo(dataModel.age());
+        Assertions.assertThat(target.data().weight()).isEqualTo(dataModel.weight());
+        Assertions.assertThat(target.data().height()).isEqualTo(dataModel.height());
+        Assertions.assertThat(target.data().last()).isEqualTo(dataModel.last());
+        Assertions.assertThat(target.country().code()).isEqualTo(country.code());
+        Assertions.assertThat(target.country().picture()).isEqualTo(country.picture());
+
+    }
+    @Test
+    void mapToFullDataInfos_should_return_null_when() {
+        //Given
+        PlayerDataModel dataModel = new PlayerDataModel(1, 200L, 8000, 180, 35, List.of(1, 0, 1, 0, 1, 1));
+        CountryModel country = new CountryModel("picture-url", "ESP");
+
+        PlayerModel source = new PlayerModel(1L, "John", "Doe", "J.D", "player-picture", "M", country, dataModel);
+
+        //When
+        PlayerFullInfosDto target = mapper.mapFullInfos(source);
+        //Then
+        Assertions.assertThat(target).isNotNull();
+        Assertions.assertThat(target.firstName()).isEqualTo(source.firstName());
+        Assertions.assertThat(target.lastName()).isEqualTo(source.lastName());
+        Assertions.assertThat(target.sex()).isEqualTo(source.sex());
+        Assertions.assertThat(target.data().points()).isEqualTo(dataModel.points());
+        Assertions.assertThat(target.data().rank()).isEqualTo(dataModel.rank());
+        Assertions.assertThat(target.data().age()).isEqualTo(dataModel.age());
+        Assertions.assertThat(target.data().weight()).isEqualTo(dataModel.weight());
+        Assertions.assertThat(target.data().height()).isEqualTo(dataModel.height());
+        Assertions.assertThat(target.data().last()).isEqualTo(dataModel.last());
+        Assertions.assertThat(target.country().code()).isEqualTo(country.code());
+        Assertions.assertThat(target.country().picture()).isEqualTo(country.picture());
+    }
+
 
 
     @Test
